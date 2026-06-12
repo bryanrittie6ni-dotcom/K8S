@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(chmod +x *)",
+      "Bash(docker build *)",
+      "Bash(docker info *)",
+      "Bash(DOCKERHUB_USER=100028762684 bash scripts/build-and-push.sh)",
+      "Bash(docker tag *)",
+      "Bash(docker push *)"
+    ]
+  }
+}

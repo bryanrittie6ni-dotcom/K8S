@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: llmops
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes auto;
+
+    error_log /var/log/nginx/error.log notice;
+    pid       /var/run/nginx.pid;
+
+    events {
+        worker_connections 1024;
+    }
+
+    http {
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+
+        map $http_upgrade $connection_upgrade {
+            ''      '';
+            default upgrade;
+        }
+
+        log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" "$http_x_forwarded_for"';
+
+        access_log /var/log/nginx/access.log main;
+
+        sendfile on;
+
+        keepalive_timeout 65;
+
+        gzip on;
+        client_max_body_size 15M;
+
+        include /etc/nginx/conf.d/*.conf;
+    }
+
+  proxy.conf: |
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+    proxy_buffering off;
+    proxy_connect_timeout 60s;
+    proxy_read_timeout 600s;
+    proxy_send_timeout 600s;
+
+  default.conf: |
+    # 证书：K8S TLS Secret 挂载到 /etc/ssl（见 nginx-deployment.yaml volumeMounts）
+    # 文件：tls.crt、tls.key（K8S TLS Secret 自动生成的文件名）
+
+    server {
+        listen 80;
+        server_name _;
+        return 301 https://$host$request_uri;
+    }
+
+    server {
+        listen 443 ssl;
+        server_name www.ailiwen.com.cn;
+
+        # API：用「变量 proxy_pass + K8S CoreDNS」动态解析。静态 upstream 只在 Nginx 启动时解析一次，
+        # Pod 重建后 IP 会变导致 Connection refused。
+        # set 必须在 rewrite 之前，否则会出现 uninitialized variable / http://:5001。
+        location /api/ {
+            resolver kube-dns.kube-system.svc.cluster.local valid=30s ipv6=off;
+            set $api_host llmops-api;
+            rewrite ^/api/(.*)$ /$1 break;
+            proxy_pass http://$api_host:5001;
+            include proxy.conf;
+        }
+
+        # 前端
+        location / {
+            proxy_pass http://llmops-ui:3000;
+            include proxy.conf;
+        }
+
+        ssl_certificate /etc/ssl/tls.crt;
+        ssl_certificate_key /etc/ssl/tls.key;
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_prefer_server_ciphers on;
+        ssl_session_cache shared:SSL:10m;
+        ssl_session_timeout 10m;
+    }
