@@ -71,7 +71,7 @@ data:
         # set 必须在 rewrite 之前，否则会出现 uninitialized variable / http://:5001。
         location /api/ {
             resolver kube-dns.kube-system.svc.cluster.local valid=30s ipv6=off;
-            set $api_host llmops-api;
+            set $api_host llmops-api.llmops.svc.cluster.local;
             rewrite ^/api/(.*)$ /$1 break;
             proxy_pass http://$api_host:5001;
             include proxy.conf;
@@ -81,7 +81,7 @@ data:
         # 因 llmops-ui 尚不存在而 crash。
         location / {
             resolver kube-dns.kube-system.svc.cluster.local valid=30s ipv6=off;
-            set $ui_host llmops-ui;
+            set $ui_host llmops-ui.llmops.svc.cluster.local;
             proxy_pass http://$ui_host:3000;
             include proxy.conf;
         }

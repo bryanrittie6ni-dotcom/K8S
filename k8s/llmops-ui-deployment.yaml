@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llmops-ui
+  namespace: llmops
+  labels:
+    app: llmops-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: llmops-ui
+  template:
+    metadata:
+      labels:
+        app: llmops-ui
+    spec:
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: "true"
+      imagePullSecrets:
+        - name: ccr-registry
+      containers:
+        - name: llmops-ui
+          image: ccr.ccs.tencentyun.com/my-app-20/llmops-ui:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              name: http
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 3
+            periodSeconds: 10

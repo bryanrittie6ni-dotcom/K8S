@@ -24,7 +24,18 @@
       "Bash(curl -sk -o /dev/null -w \"HTTP %{http_code}\\\\n\" https://172.17.0.10/)",
       "Bash(curl -sI http://172.17.0.10/)",
       "Bash(CCR_PASSWORD=Qq289848 sudo *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git pull *)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code} -> redirect to %{redirect_url}\\\\n\" http://172.17.0.10/)",
+      "Bash(curl -sk https://172.17.0.10/)",
+      "Bash(bash -n /home/ubuntu/K8S/scripts/deploy-ui.sh)",
+      "Bash(kubectl cluster-info *)",
+      "Bash(ping -c 1 -W 1 192.168.0.2)",
+      "Bash(ip route *)",
+      "Bash(curl -s --connect-timeout 3 ifconfig.me)",
+      "Bash(bash -n /home/ubuntu/K8S/scripts/deploy-nginx.sh)"
     ]
   }
 }

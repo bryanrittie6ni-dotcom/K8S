@@ -139,7 +139,7 @@ kubectl create secret docker-registry ccr-registry \
   --docker-password="${CCR_PASSWORD:-}" ...
 
 # ✅ 正确使用
-CCR_PASSWORD=Qq289848 sudo -E ./scripts/deploy.sh
+CCR_PASSWORD=Qq289848 sudo -E ./scripts/deploy-nginx.sh
 ```
 
 `-E` 保留当前用户环境变量传递给 `sudo`。脚本中不应硬编码凭据。
