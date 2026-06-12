@@ -6,7 +6,25 @@
       "Bash(docker info *)",
       "Bash(DOCKERHUB_USER=100028762684 bash scripts/build-and-push.sh)",
       "Bash(docker tag *)",
-      "Bash(docker push *)"
+      "Bash(docker push *)",
+      "Bash(sudo *)",
+      "Bash(kubectl get pods *)",
+      "Bash(kubectl logs *)",
+      "Bash(kubectl describe *)",
+      "Bash(kubectl get *)",
+      "Bash(kubectl exec *)",
+      "Bash(openssl x509 *)",
+      "Bash(kubectl apply *)",
+      "Bash(kubectl rollout *)",
+      "Bash(xargs -I{} kubectl debug -n llmops {} --image=busybox --target=nginx -- sleep 60)",
+      "Bash(kubectl delete *)",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -sk -o /dev/null -w \"HTTP %{http_code}\" https://172.17.0.10/)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code} -> redirect to %{redirect_url}\" http://172.17.0.10/)",
+      "Bash(curl -sk -o /dev/null -w \"HTTP %{http_code}\\\\n\" https://172.17.0.10/)",
+      "Bash(curl -sI http://172.17.0.10/)",
+      "Bash(CCR_PASSWORD=Qq289848 sudo *)",
+      "Bash(git add *)"
     ]
   }
 }

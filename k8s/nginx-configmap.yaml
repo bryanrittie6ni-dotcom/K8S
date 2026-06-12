@@ -77,9 +77,12 @@ data:
             include proxy.conf;
         }
 
-        # 前端
+        # 前端：改用变量 proxy_pass + resolver 运行时解析，避免 nginx 启动时
+        # 因 llmops-ui 尚不存在而 crash。
         location / {
-            proxy_pass http://llmops-ui:3000;
+            resolver kube-dns.kube-system.svc.cluster.local valid=30s ipv6=off;
+            set $ui_host llmops-ui;
+            proxy_pass http://$ui_host:3000;
             include proxy.conf;
         }
 

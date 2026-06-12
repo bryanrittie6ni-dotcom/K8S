@@ -1,0 +1,29 @@
+# Placeholder Services — nginx upstream 至少需要一个可解析的 DNS 名称才能启动。
+# 后续部署真实 Pod 时更新 selector 或让 Deployment 自动匹配。
+apiVersion: v1
+kind: Service
+metadata:
+  name: llmops-ui
+  namespace: llmops
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+  selector:
+    app: llmops-ui
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llmops-api
+  namespace: llmops
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5001
+      targetPort: 5001
+      protocol: TCP
+  selector:
+    app: llmops-api
