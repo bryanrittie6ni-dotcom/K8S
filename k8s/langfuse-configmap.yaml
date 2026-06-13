@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: langfuse-config
+  namespace: llmops
+data:
+  # ====== NextAuth ======
+  NEXTAUTH_URL: "https://www.ailiwen.com.cn/langfuse"
+
+  # ====== ClickHouse 连接 ======
+  CLICKHOUSE_URL: "http://clickhouse:8123"
+  CLICKHOUSE_MIGRATION_URL: "clickhouse://clickhouse:9000"
+  CLICKHOUSE_USER: "clickhouse"
+  CLICKHOUSE_CLUSTER_ENABLED: "false"
+
+  # ====== Redis 连接 ======
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+  REDIS_TLS_ENABLED: "false"
+  LANGFUSE_BULLMQ_SKIP_REDIS_VERSION_CHECK: "false"
+
+  # ====== S3 / MinIO ======
+  LANGFUSE_S3_EVENT_UPLOAD_BUCKET: "langfuse"
+  LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: "http://minio:9000"
+  LANGFUSE_S3_EVENT_UPLOAD_REGION: "us-east-1"
+  LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
+  LANGFUSE_S3_EVENT_UPLOAD_PREFIX: "events/"
+
+  LANGFUSE_S3_MEDIA_UPLOAD_BUCKET: "langfuse"
+  LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: "http://minio:9000"
+  LANGFUSE_S3_MEDIA_UPLOAD_REGION: "us-east-1"
+  LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
+  LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: "media/"
+
+  LANGFUSE_S3_BATCH_EXPORT_ENABLED: "false"
+  LANGFUSE_S3_BATCH_EXPORT_BUCKET: "langfuse"
+  LANGFUSE_S3_BATCH_EXPORT_ENDPOINT: "http://minio:9000"
+  LANGFUSE_S3_BATCH_EXPORT_REGION: "us-east-1"
+  LANGFUSE_S3_BATCH_EXPORT_FORCE_PATH_STYLE: "true"
+  LANGFUSE_S3_BATCH_EXPORT_PREFIX: "exports/"
+
+  # ====== 功能开关 ======
+  LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "false"
+  TELEMETRY_ENABLED: "true"
+  LANGFUSE_ENABLE_BLOB_STORAGE_FILE_LOG: "true"
+
+  # ====== 日志 ======
+  LANGFUSE_LOG_LEVEL: "info"
+  LANGFUSE_LOG_FORMAT: "text"

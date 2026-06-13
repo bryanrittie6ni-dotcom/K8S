@@ -77,6 +77,15 @@ data:
             include proxy.conf;
         }
 
+        # Langfuse：LLM 可观测性平台（Next.js app，已通过 NEXT_PUBLIC_BASE_PATH=/langfuse 构建）。
+        # 不 rewrite 前缀 — Langfuse 自身处理 base path。
+        location /langfuse {
+            resolver kube-dns.kube-system.svc.cluster.local valid=30s ipv6=off;
+            set $langfuse_web_host langfuse-web.llmops.svc.cluster.local;
+            proxy_pass http://$langfuse_web_host:3000;
+            include proxy.conf;
+        }
+
         # 前端：改用变量 proxy_pass + resolver 运行时解析，避免 nginx 启动时
         # 因 llmops-ui 尚不存在而 crash。
         location / {

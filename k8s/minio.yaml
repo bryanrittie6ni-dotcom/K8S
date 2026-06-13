@@ -1,0 +1,130 @@
+# MinIO — S3 兼容对象存储
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-data
+  namespace: llmops
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: local-path
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: llmops
+  labels:
+    app: minio
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9000
+      targetPort: 9000
+      name: api
+    - port: 9001
+      targetPort: 9001
+      name: console
+  selector:
+    app: minio
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: llmops
+  labels:
+    app: minio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: vm-0-10-ubuntu
+      imagePullSecrets:
+        - name: ccr-registry
+      securityContext:
+        fsGroup: 65532
+      initContainers:
+        - name: fix-permissions
+          image: ccr.ccs.tencentyun.com/my-app-20/minio-mc:latest
+          command: ["sh", "-c", "chown -R 65532:65532 /data 2>/dev/null; chmod -R u+rwx /data 2>/dev/null; echo 'permissions fixed'"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      containers:
+        - name: minio
+          image: ccr.ccs.tencentyun.com/my-app-20/minio:latest
+          args:
+            - server
+            - /data
+            - --console-address
+            - ":9001"
+          ports:
+            - containerPort: 9000
+              name: api
+            - containerPort: 9001
+              name: console
+          env:
+            - name: MINIO_ROOT_USER
+              value: "minio"
+            - name: MINIO_ROOT_PASSWORD
+              value: "miniosecret"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: 9000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /minio/health/ready
+              port: 9000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: minio-data
+---
+# 一次性 Job：创建 langfuse 所需的 S3 bucket
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-create-bucket
+  namespace: llmops
+spec:
+  ttlSecondsAfterFinished: 60
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: create-bucket
+          image: ccr.ccs.tencentyun.com/my-app-20/minio-mc:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              mc alias set local http://minio:9000 minio miniosecret
+              mc mb --ignore-existing local/langfuse
+              echo "Bucket 'langfuse' ready"

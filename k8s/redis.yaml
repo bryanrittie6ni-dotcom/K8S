@@ -1,0 +1,68 @@
+# Redis — Langfuse 队列/缓存
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: llmops
+  labels:
+    app: redis
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+      targetPort: 6379
+      name: redis
+  selector:
+    app: redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: llmops
+  labels:
+    app: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: vm-0-10-ubuntu
+      imagePullSecrets:
+        - name: ccr-registry
+      containers:
+        - name: redis
+          image: ccr.ccs.tencentyun.com/my-app-20/redis:7
+          ports:
+            - containerPort: 6379
+              name: redis
+          args:
+            - redis-server
+            - --requirepass
+            - myredissecret
+            - --appendonly
+            - "yes"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            exec:
+              command: ["redis-cli", "-a", "myredissecret", "ping"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["redis-cli", "-a", "myredissecret", "ping"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
