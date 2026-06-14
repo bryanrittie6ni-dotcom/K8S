@@ -1,0 +1,54 @@
+# ============================================================
+# 共享基础设施连接信息 (namespace: llmops)
+# 新项目通过跨 namespace DNS 引用这些服务
+# ============================================================
+
+# PostgreSQL
+postgres:
+  host: postgres.llmops.svc.cluster.local
+  port: 5432
+  user: postgres
+  password: postgres5432
+  database: postgres
+  url: postgresql://postgres:postgres5432@postgres.llmops.svc.cluster.local:5432/postgres
+
+# Redis
+redis:
+  host: redis.llmops.svc.cluster.local
+  port: 6379
+  password: myredissecret
+
+# MinIO (S3 兼容对象存储)
+minio:
+  endpoint: http://minio.llmops.svc.cluster.local:9000
+  console: http://minio.llmops.svc.cluster.local:9001
+  access_key: minio
+  secret_key: miniosecret
+
+# ClickHouse
+clickhouse:
+  host: clickhouse.llmops.svc.cluster.local
+  http_port: 8123
+  native_port: 9000
+  user: clickhouse
+  password: clickhouse
+  http_url: http://clickhouse.llmops.svc.cluster.local:8123
+  native_url: clickhouse://clickhouse:clickhouse@clickhouse.llmops.svc.cluster.local:9000
+
+# ============================================================
+# 使用方式:
+#
+#   新项目的 Pod 处于任意 namespace，直接用上面的 FQDN 即可。
+#   示例 ConfigMap:
+#
+#   apiVersion: v1
+#   kind: ConfigMap
+#   metadata:
+#     name: my-app-config
+#     namespace: my-project
+#   data:
+#     DATABASE_URL: "postgresql://postgres:postgres5432@postgres.llmops.svc.cluster.local:5432/myapp"
+#     REDIS_HOST: "redis.llmops.svc.cluster.local"
+#     REDIS_PORT: "6379"
+#     S3_ENDPOINT: "http://minio.llmops.svc.cluster.local:9000"
+# ============================================================
