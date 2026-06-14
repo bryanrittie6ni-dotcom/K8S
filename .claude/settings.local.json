@@ -109,7 +109,31 @@
       "Bash(iptables -L KUBE-ROUTER-FORWARD -n)",
       "Bash(curl -v --connect-timeout 5 telnet://10.42.0.71:5432)",
       "Bash(curl -v --connect-timeout 5 telnet://10.43.82.98:5432)",
-      "Bash(iptables -L KUBE-FORWARD -n)"
+      "Bash(iptables -L KUBE-FORWARD -n)",
+      "Bash(bash *)",
+      "Bash(curl -sI -o /dev/null -w \"%{http_code} %{redirect_url}\" https://www.ailiwen.com.cn/langfuse)",
+      "Bash(curl -sI https://www.ailiwen.com.cn/langfuse)",
+      "Bash(python3 -c \"import sys,json,base64; d=json.load\\(sys.stdin\\); [print\\(f'{k}={base64.b64decode\\(v\\).decode\\(\\)}'\\) for k,v in d.items\\(\\)]\")",
+      "Bash(curl -sI https://www.ailiwen.com.cn/langfuse/)",
+      "Bash(curl -s https://www.ailiwen.com.cn/langfuse)",
+      "Bash(curl -sI -o /dev/null -w \"HTTP %{http_code}\\\\n\" https://www.ailiwen.com.cn/langfuse)",
+      "Bash(curl -sI https://www.ailiwen.com.cn/)",
+      "Bash(curl -sI https://www.ailiwen.com.cn/api/health)",
+      "Bash(curl -sI -L https://www.ailiwen.com.cn/langfuse)",
+      "Bash(curl -sI https://www.ailiwen.com.cn/langfuse/auth/sign-in)",
+      "Bash(curl -sI https://www.ailiwen.com.cn/langfuse/projects)",
+      "Bash(curl -sIL https://www.ailiwen.com.cn/langfuse/projects)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(curl -sI -o /dev/null -w \"%{http_code}\" https://www.ailiwen.com.cn/langfuse)",
+      "Bash(curl -sI -o /dev/null -w \"%{http_code}\" https://www.ailiwen.com.cn/langfuse/)",
+      "Bash(curl -sI -o /dev/null -w \"%{http_code}\" https://www.ailiwen.com.cn/)",
+      "Bash(kubectl set image *)",
+      "Bash(kubectl top *)",
+      "Bash(kubectl wait *)",
+      "Bash(kubectl patch deployment *)",
+      "Bash(kubectl scale *)",
+      "Bash(git stash *)",
+      "Bash(python3 -m json.tool .claude/settings.local.json)"
     ]
   }
 }

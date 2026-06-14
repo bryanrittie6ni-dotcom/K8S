@@ -47,7 +47,6 @@ data:
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection $connection_upgrade;
-    proxy_buffering off;
     proxy_connect_timeout 60s;
     proxy_read_timeout 600s;
     proxy_send_timeout 600s;
@@ -70,11 +69,21 @@ data:
         # Pod 重建后 IP 会变导致 Connection refused。
         # set 必须在 rewrite 之前，否则会出现 uninitialized variable / http://:5001。
         location /api/ {
-            resolver kube-dns.kube-system.svc.cluster.local valid=30s ipv6=off;
+            resolver 10.43.0.10 valid=30s ipv6=off;
             set $api_host llmops-api.llmops.svc.cluster.local;
             rewrite ^/api/(.*)$ /$1 break;
             proxy_pass http://$api_host:5001;
             include proxy.conf;
+            proxy_buffering off;
+        }
+
+        # Langfuse：已内置 basePath=/langfuse，Nginx 直接透传完整路径，不剥离前缀
+        location /langfuse {
+            resolver 10.43.0.10 valid=30s ipv6=off;
+            set $langfuse_host langfuse-web.llmops.svc.cluster.local;
+            proxy_pass http://$langfuse_host:3000;
+            include proxy.conf;
+            proxy_buffering off;
         }
 
         # Langfuse：LLM 可观测性平台（Next.js app，已通过 NEXT_PUBLIC_BASE_PATH=/langfuse 构建）。
@@ -89,10 +98,11 @@ data:
         # 前端：改用变量 proxy_pass + resolver 运行时解析，避免 nginx 启动时
         # 因 llmops-ui 尚不存在而 crash。
         location / {
-            resolver kube-dns.kube-system.svc.cluster.local valid=30s ipv6=off;
+            resolver 10.43.0.10 valid=30s ipv6=off;
             set $ui_host llmops-ui.llmops.svc.cluster.local;
             proxy_pass http://$ui_host:3000;
             include proxy.conf;
+            proxy_buffering off;
         }
 
         ssl_certificate /etc/ssl/tls.crt;
