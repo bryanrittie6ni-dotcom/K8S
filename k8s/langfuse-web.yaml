@@ -22,6 +22,7 @@ spec:
       containers:
         - name: langfuse-web
           image: ccr.ccs.tencentyun.com/my-app-20/langfuse-web:3
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
               name: http
